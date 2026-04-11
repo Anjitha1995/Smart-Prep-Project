@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from "../components/common/Button";
 import ProfileSettingsCard from "../components/settings/ProfileSettingsCard";
-import StudyPreferencesCard from "../components/settings/StudyPreferencesCard";
+import StudyPreferencesCard from "../components/settings/studyPreferencesCard";
 import TimerSettingsCard from "../components/settings/TimerSettingsCard";
 import NotificationSettingsCard from "../components/settings/NotificationSettingsCard";
 import {
