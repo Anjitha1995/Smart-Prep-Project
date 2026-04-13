@@ -5,21 +5,13 @@ import {
   markTopicCompletedForUser,
   markRevisionCompletedForUser,
 } from "../../features/subjects/subjectSlice";
-import { generateStudyPlanFromSubjects } from "../../features/studyPlan/studyPlanSlice";
-import { selectSubjects } from "../../features/subjects/subjectSelectors";
-import { useSelector } from "react-redux";
 
 export default function StudyPlanCard({ task }) {
   const dispatch = useDispatch();
   const session = getLoggedInUserSession();
   const userId = session?.id;
-  const subjects = useSelector(selectSubjects);
 
   if (!task) return null;
-
-  const refreshPlan = () => {
-    dispatch(generateStudyPlanFromSubjects(subjects, 3));
-  };
 
   const handleStudyComplete = () => {
     if (task.type !== "Study" || task.completed) return;
@@ -30,8 +22,6 @@ export default function StudyPlanCard({ task }) {
         topicId: task.topicId,
       })
     );
-
-    setTimeout(refreshPlan, 0);
   };
 
   const handleRevisionComplete = () => {
@@ -43,8 +33,6 @@ export default function StudyPlanCard({ task }) {
         topicId: task.topicId,
       })
     );
-
-    setTimeout(refreshPlan, 0);
   };
 
   const isStudyCompleted = task.type === "Study" && task.completed;

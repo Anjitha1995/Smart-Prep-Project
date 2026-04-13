@@ -35,20 +35,9 @@ export default function StudyPlanPage() {
       .filter((day) => day.pendingTasks.length > 0 || day.completedTasks.length > 0);
   };
 
-  const todayTasks = useMemo(
-    () => splitTasksByStatus(groupedPlan.today),
-    [groupedPlan.today]
-  );
-
-  const tomorrowTasks = useMemo(
-    () => splitTasksByStatus(groupedPlan.tomorrow),
-    [groupedPlan.tomorrow]
-  );
-
-  const upcomingTasks = useMemo(
-    () => splitTasksByStatus(groupedPlan.upcoming),
-    [groupedPlan.upcoming]
-  );
+  const todayTasks = useMemo(() => splitTasksByStatus(groupedPlan.today), [groupedPlan.today]);
+  const tomorrowTasks = useMemo(() => splitTasksByStatus(groupedPlan.tomorrow), [groupedPlan.tomorrow]);
+  const upcomingTasks = useMemo(() => splitTasksByStatus(groupedPlan.upcoming), [groupedPlan.upcoming]);
 
   const hasAnyTasks =
     todayTasks.length > 0 || tomorrowTasks.length > 0 || upcomingTasks.length > 0;
@@ -57,9 +46,7 @@ export default function StudyPlanPage() {
     <div className="space-y-10">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Study Plan</h1>
-        <p className="mt-2 text-slate-600">
-          Your personalized study schedule.
-        </p>
+        <p className="mt-2 text-slate-600">Your personalized study schedule.</p>
       </div>
 
       {!hasAnyTasks ? (

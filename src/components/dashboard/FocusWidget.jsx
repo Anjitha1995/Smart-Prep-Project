@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
 import Card from "../common/Card";
 import Button from "../common/Button";
 import { Timer } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function FocusWidget({
   time = "25:00",
@@ -37,7 +37,7 @@ export default function FocusWidget({
               variant="secondary"
               className="w-full border-white bg-white text-blue-700 hover:bg-blue-50"
             >
-              Start Focus
+              Open Timer
             </Button>
           </Link>
         </div>

@@ -7,6 +7,7 @@ import { validateSubjectData } from "../../utils/validationUtils";
 import { deriveSubjectDifficulty } from "../../utils/subjectUtils";
 
 const initialForm = {
+  id: null,
   name: "",
   examDate: "",
   totalTopics: 0,
@@ -36,6 +37,8 @@ export default function AddSubjectModal({
   const [topicError, setTopicError] = useState({});
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (editSubject) {
       setForm({
         id: editSubject.id,
@@ -59,9 +62,11 @@ export default function AddSubjectModal({
     setErrors({});
     setTopicInput(initialTopicInput);
     setTopicError({});
-  }, [editSubject, isOpen]);
+  }, [isOpen, editSubject]);
 
   if (!isOpen) return null;
+
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   const getSelectClasses = (hasError) =>
     `mt-2 w-full rounded-2xl border px-4 py-3 text-base text-slate-900 outline-none transition-all duration-200 sm:px-5 sm:py-4 sm:text-lg ${
@@ -144,11 +149,13 @@ export default function AddSubjectModal({
       name: topicInput.name.trim(),
       difficulty: topicInput.difficulty,
       completed: false,
-      revisionCompleted: false
+      revisionCompleted: false,
+      revisionHistory: [],
     };
 
     setForm((prev) => {
       const updatedTopics = [...prev.topics, newTopic];
+
       return {
         ...prev,
         topics: updatedTopics,
@@ -168,6 +175,7 @@ export default function AddSubjectModal({
   const handleDeleteTopic = (topicId) => {
     setForm((prev) => {
       const updatedTopics = prev.topics.filter((topic) => topic.id !== topicId);
+
       return {
         ...prev,
         topics: updatedTopics,
@@ -185,18 +193,43 @@ export default function AddSubjectModal({
     };
 
     const validationErrors = validateSubjectData(preparedForm);
+
+    if (!form.examDate) {
+      validationErrors.examDate = "Exam date is required";
+    } else if (form.examDate < getTodayDate()) {
+      validationErrors.examDate = "Back-dated exam date is not allowed";
+    }
+
+    if (form.topics.length === 0) {
+      validationErrors.topics = "Please add at least one topic";
+      validationErrors.totalTopics = "At least one topic is required";
+    }
+
+    if (
+      form.dailyStudyHours === "" ||
+      Number(form.dailyStudyHours) < 0
+    ) {
+      validationErrors.dailyStudyHours =
+        "Daily study hours must be 0 or greater";
+    }
+
+    if (
+      form.progress !== "" &&
+      (Number(form.progress) < 0 || Number(form.progress) > 100)
+    ) {
+      validationErrors.progress = "Progress must be between 0 and 100";
+    }
+
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) return;
-
-    const subjectDifficulty = deriveSubjectDifficulty(form.topics);
 
     const subjectPayload = {
       id: form.id || Date.now(),
       name: form.name.trim(),
       examDate: form.examDate,
       totalTopics: form.topics.length,
-      difficulty: subjectDifficulty,
+      difficulty: deriveSubjectDifficulty(form.topics),
       dailyStudyHours: Number(form.dailyStudyHours),
       revisionFrequency: form.revisionFrequency,
       priority: form.priority,
@@ -247,6 +280,7 @@ export default function AddSubjectModal({
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div className="grid gap-5 md:grid-cols-2">
             <Input
+              id="subject-name"
               label="Subject Name"
               name="name"
               value={form.name}
@@ -257,6 +291,7 @@ export default function AddSubjectModal({
             />
 
             <Input
+              id="exam-date"
               label="Exam Date"
               name="examDate"
               type="date"
@@ -269,6 +304,7 @@ export default function AddSubjectModal({
 
           <div className="grid gap-5 md:grid-cols-2">
             <Input
+              id="total-topics"
               label="Total Topics"
               name="totalTopics"
               type="number"
@@ -279,6 +315,7 @@ export default function AddSubjectModal({
             />
 
             <Input
+              id="daily-study-hours"
               label="Daily Study Hours"
               name="dailyStudyHours"
               type="number"
@@ -293,10 +330,14 @@ export default function AddSubjectModal({
 
           <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <label htmlFor="subject-difficulty" className="block text-base font-semibold text-slate-800 sm:text-lg">
+              <label
+                htmlFor="derived-subject-difficulty"
+                className="block text-base font-semibold text-slate-800 sm:text-lg"
+              >
                 Derived Subject Difficulty
               </label>
-              <input name="subject-difficulty" id="subject-difficulty" 
+              <input
+                id="derived-subject-difficulty"
                 type="text"
                 value={derivedDifficulty || "Will be calculated from topics"}
                 readOnly
@@ -305,12 +346,15 @@ export default function AddSubjectModal({
             </div>
 
             <div>
-              <label htmlFor="priority" className="block text-base font-semibold text-slate-800 sm:text-lg">
+              <label
+                htmlFor="priority"
+                className="block text-base font-semibold text-slate-800 sm:text-lg"
+              >
                 Priority <span className="ml-1 text-red-500">*</span>
               </label>
               <select
-                name="priority"
                 id="priority"
+                name="priority"
                 value={form.priority}
                 onChange={handleChange}
                 className={getSelectClasses(!!errors.priority)}
@@ -330,11 +374,14 @@ export default function AddSubjectModal({
 
           <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <label htmlFor="revisionFrequency" className="block text-base font-semibold text-slate-800 sm:text-lg">
+              <label
+                htmlFor="revision-frequency"
+                className="block text-base font-semibold text-slate-800 sm:text-lg"
+              >
                 Revision Frequency <span className="ml-1 text-red-500">*</span>
               </label>
               <select
-              id="revisionFrequency"
+                id="revision-frequency"
                 name="revisionFrequency"
                 value={form.revisionFrequency}
                 onChange={handleChange}
@@ -354,8 +401,8 @@ export default function AddSubjectModal({
             </div>
 
             <Input
-              label="Current Progress (%)"
               id="progress"
+              label="Current Progress (%)"
               name="progress"
               type="number"
               min="0"
@@ -375,6 +422,7 @@ export default function AddSubjectModal({
 
             <div className="mt-4 grid gap-4 md:grid-cols-[1.3fr_1fr_auto]">
               <Input
+                id="topic-name"
                 label="Topic Name"
                 name="name"
                 value={topicInput.name}
@@ -385,11 +433,14 @@ export default function AddSubjectModal({
               />
 
               <div>
-                <label htmlFor="topic-difficulty" className="block text-base font-semibold text-slate-800 sm:text-lg">
+                <label
+                  htmlFor="topic-difficulty"
+                  className="block text-base font-semibold text-slate-800 sm:text-lg"
+                >
                   Topic Difficulty <span className="ml-1 text-red-500">*</span>
                 </label>
                 <select
-                id="topic-difficulty"
+                  id="topic-difficulty"
                   name="difficulty"
                   value={topicInput.difficulty}
                   onChange={handleTopicChange}

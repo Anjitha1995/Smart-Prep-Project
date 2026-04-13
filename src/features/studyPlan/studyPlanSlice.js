@@ -1,5 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { generateRuleBasedStudyPlan, groupStudyPlan } from "../../utils/studyPlanUtils";
+import {
+  generateRuleBasedStudyPlan,
+  groupStudyPlan,
+} from "../../utils/studyPlanUtils";
 
 const initialState = {
   plan: [],

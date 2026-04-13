@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/common/Button";
 import SubjectCard from "../components/subjects/SubjectCard";
@@ -6,32 +6,21 @@ import AddSubjectModal from "../components/subjects/AddSubjectModal";
 import { Plus } from "lucide-react";
 import { getLoggedInUserSession } from "../services/storageServices";
 import {
-  loadSubjectsForUser,
   addSubjectForUser,
   editSubjectForUser,
   removeSubjectForUser,
 } from "../features/subjects/subjectSlice";
-import { generateStudyPlanFromSubjects } from "../features/studyPlan/studyPlanSlice";
+import { selectSubjects } from "../features/subjects/subjectSelectors";
 
 export default function SubjectsPage() {
   const dispatch = useDispatch();
-  const subjects = useSelector((state) => state.subjects.subjects);
+  const subjects = useSelector(selectSubjects);
 
   const session = getLoggedInUserSession();
   const userId = session?.id;
 
   const [openModal, setOpenModal] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-
-  useEffect(() => {
-    if (userId) {
-      dispatch(loadSubjectsForUser(userId));
-    }
-  }, [dispatch, userId]);
-
-  useEffect(() => {
-    dispatch(generateStudyPlanFromSubjects(subjects, 3));
-  }, [dispatch, subjects]);
 
   const handleAddSubject = (subject) => {
     dispatch(addSubjectForUser(userId, subject));

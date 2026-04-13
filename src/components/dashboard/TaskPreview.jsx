@@ -1,14 +1,17 @@
 import Card from "../common/Card";
 import Button from "../common/Button";
+import { Link } from "react-router-dom";
 
 export default function TasksPreview({ tasks = [] }) {
   return (
     <Card className="h-full" padding="lg" shadow="md" rounded="lg">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-900">Today's Tasks</h2>
+        <Link to="/study-plan">
         <Button variant="ghost" size="sm">
           View All
         </Button>
+        </Link>
       </div>
 
       <div className="mt-5 space-y-3">

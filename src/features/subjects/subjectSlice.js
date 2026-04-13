@@ -41,23 +41,19 @@ const subjectSlice = createSlice({
         if (subject.id !== subjectId) return subject;
 
         const updatedTopics = subject.topics.map((topic) =>
-          topic.id === topicId
-            ? { ...topic, completed: true }
-            : topic
+          topic.id === topicId ? { ...topic, completed: true } : topic
         );
 
         const completedCount = updatedTopics.filter(
           (topic) => topic.completed
         ).length;
 
-        const progress = updatedTopics.length
-          ? Math.round((completedCount / updatedTopics.length) * 100)
-          : 0;
-
         return {
           ...subject,
           topics: updatedTopics,
-          progress,
+          progress: updatedTopics.length
+            ? Math.round((completedCount / updatedTopics.length) * 100)
+            : 0,
         };
       });
     },

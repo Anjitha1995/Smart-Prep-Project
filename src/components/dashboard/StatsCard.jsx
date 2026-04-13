@@ -20,14 +20,14 @@ export default function StatsCard({
         <div>
           <p className="text-sm font-medium text-slate-500">{title}</p>
           <h3 className="mt-2 text-2xl font-bold text-slate-900">{value}</h3>
-          {subtitle && (
-            <p className="mt-2 text-sm text-slate-500">{subtitle}</p>
-          )}
+          {subtitle && <p className="mt-2 text-sm text-slate-500">{subtitle}</p>}
         </div>
 
         {icon && (
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-2xl ${accentClasses[accent]}`}
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
+              accentClasses[accent] || accentClasses.blue
+            }`}
           >
             {icon}
           </div>
